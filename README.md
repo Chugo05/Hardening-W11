@@ -27,6 +27,8 @@ El toolkit está compuesto por un **script orquestador** (`Hardening_Hugo.ps1`) 
 - **Anti-Ransomware** (`EnableControlledFolderAccess`): protege carpetas del sistema contra modificaciones no autorizadas.
 - **Protección de Red** (`EnableNetworkProtection`): bloquea conexiones a dominios maliciosos conocidos.
 
+> ⚠️ **Compatibilidad:** Este módulo **no funcionará** si hay un antivirus de terceros instalado (Kaspersky, ESET, Avast, RAV Endpoint, Norton, etc.). Windows desactiva el servicio `WinDefend` automáticamente cuando detecta otro motor antivirus activo, lo que hace que `Get-MpPreference` y `Set-MpPreference` fallen con el error `HRESULT 0x800106ba`. Para usar este módulo es necesario desinstalar el antivirus de terceros y reiniciar el equipo, tras lo cual Defender se reactiva de forma automática.
+
 **`Process_Hunter.ps1`** — Realiza tres capas de detección:
 1. Cruza la lista de `Get-Process` con `Get-CimInstance Win32_Process` para identificar procesos que se ocultan del Task Manager.
 2. Analiza la ruta del ejecutable en busca de ubicaciones de riesgo (`AppData`, `Temp`, `Downloads`, `Public`).
@@ -156,6 +158,8 @@ Proceso svchost32.exe (PID: 6032) finalizado.
 ---
 
 **Paso 3 — Reforzar Defender**
+
+> ⚠️ Este paso requiere que **no haya antivirus de terceros instalado**. Si el equipo tiene Kaspersky, ESET, RAV Endpoint u otro producto similar, Windows Defender estará desactivado y este módulo devolverá un error. Ver nota de compatibilidad en la sección de descripción técnica.
 
 Seleccionar opción `[2]` y activar todas las protecciones:
 

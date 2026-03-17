@@ -1,4 +1,4 @@
-# 🛡️ Win11 Hardening Toolkit — by Chugo_05
+# 🛡️ Win11 Hardening Toolkit — by Chugo05
 
 Toolkit modular de bastionado para **Windows 11** escrito en PowerShell. Permite reforzar la seguridad del sistema operativo mediante un menú interactivo que agrupa distintas herramientas de hardening, cada una enfocada en un vector de ataque diferente.
 

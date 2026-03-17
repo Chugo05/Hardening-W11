@@ -27,7 +27,7 @@ El toolkit está compuesto por un **script orquestador** (`Hardening_Hugo.ps1`) 
 - **Anti-Ransomware** (`EnableControlledFolderAccess`): protege carpetas del sistema contra modificaciones no autorizadas.
 - **Protección de Red** (`EnableNetworkProtection`): bloquea conexiones a dominios maliciosos conocidos.
 
-> ⚠️ **Compatibilidad:** Este módulo **no funcionará** si hay un antivirus de terceros instalado (Kaspersky, ESET, Avast, RAV Endpoint, Norton, etc.). Windows desactiva el servicio `WinDefend` automáticamente cuando detecta otro motor antivirus activo, lo que hace que `Get-MpPreference` y `Set-MpPreference` fallen con el error `HRESULT 0x800106ba`. Por esto, solo se recomienda usar este módulo si usas Windows Defender
+> ⚠️ **Compatibilidad:** Este módulo **podría no funcionar** si hay un antivirus de terceros instalado (Kaspersky, ESET, Avast, RAV Endpoint, Norton, etc.). A veces Windows desactiva el servicio `WinDefend` automáticamente cuando detecta otro motor antivirus activo, lo que hace que `Get-MpPreference` y `Set-MpPreference` fallen con el error `HRESULT 0x800106ba`. Por esto, solo se recomienda usar este módulo si usas Windows Defender.
 
 **`Process_Hunter.ps1`** — Realiza tres capas de detección:
 1. Cruza la lista de `Get-Process` con `Get-CimInstance Win32_Process` para identificar procesos que se ocultan del Task Manager.

@@ -1,26 +1,44 @@
-# 🛡️ Win11 Hardening Toolkit
+🛡️ Win11 Hardening Toolkit
+Este proyecto es una suite de herramientas de bastionado (hardening) desarrollada en PowerShell para Windows 11. Está diseñada para administradores de sistemas y profesionales de ciberseguridad que necesitan reducir la superficie de ataque de un equipo de forma rápida, interactiva y reversible.
 
-![PowerShell](https://img.shields.io/badge/PowerShell-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white)
-![Windows 11](https://img.shields.io/badge/Windows%2011-%230079d5.svg?style=for-the-badge&logo=Windows%2011&logoColor=white)
+⚙️ Descripción Técnica
+El toolkit opera mediante la manipulación directa de configuraciones de bajo nivel del sistema operativo, agrupadas en cinco vectores críticos:
 
-Este es un toolkit integral de bastionado (hardening) para sistemas Windows 11, desarrollado en PowerShell. El objetivo es reducir la superficie de ataque del sistema operativo mediante la automatización de políticas de seguridad, limpieza de telemetría y auditoría de bajo nivel.
+Privacidad y Telemetría (Escudo_Privacidad.ps1): Modifica objetos del Registro de Windows (HKLM) para desactivar el flujo de datos hacia servidores de Microsoft y utiliza el módulo Appx para la purga forzada de software preinstalado (bloatware).
 
-## 🚀 Módulos Principales
+Protección Proactiva (Apoyo_Defender.ps1): Interactúa con el motor de Windows Defender mediante el comando Set-MpPreference, habilitando niveles de protección en la nube (Cloud Block Level) y protección contra aplicaciones potencialmente no deseadas (PUA) que no vienen activas por defecto.
 
-1.  **Escudo de Privacidad**: Desactivación de telemetría, ID de publicidad y purga profunda de bloatware de Microsoft.
-2.  **Fortificador de Defender**: Configuración de protección contra aplicaciones potencialmente no deseadas (PUA), protección en la nube avanzada y anti-ransomware.
-3.  **Process Hunter**: Análisis forense comparando la lista de procesos estándar contra consultas CIM/WMI para detectar procesos ocultos (stealth) y binarios sin firma digital.
-4.  **Gestor de Red**: Control de protocolos heredados vulnerables (SMBv1, LLMNR, NetBIOS) y gestión de RDP.
-5.  **Control de USB**: Bloqueo y desbloqueo selectivo de dispositivos de almacenamiento masivo a nivel de registro (`USBSTOR`).
+Auditoría Forense de Procesos (Process_Hunter.ps1): Implementa un análisis comparativo entre la lista de procesos estándar y consultas CIM/WMI (Win32_Process). Esto permite detectar procesos que se ocultan de las APIs de usuario y verificar la integridad de los binarios mediante firmas digitales (Get-AuthenticodeSignature).
 
-## 🛠️ Instalación y Uso
+Gestión de Superficie de Red (Gestor_de_Red.ps1): Administra protocolos heredados vulnerables como SMBv1, LLMNR y NetBIOS, además de controlar el estado del servicio de Escritorio Remoto (RDP).
 
-### Requisitos previos
-* Sistema Operativo: Windows 11 (preferiblemente).
-* Privilegios: **Administrador**.
+Control de Hardware (Control_USB.ps1): Manipula el estado de inicio del driver USBSTOR en el registro del sistema, permitiendo bloquear el almacenamiento masivo USB sin afectar a periféricos como teclados o ratones.
 
-### Ejecución rápida
-Para ejecutar el toolkit sin restricciones de política de ejecución, abre una terminal de PowerShell como administrador y lanza:
+📥 Instalación
+Clonar el repositorio:
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process; .\Hardening_Hugo.ps1
+Bash
+git clone https://github.com/TU_USUARIO/Win11-Hardening-Toolkit.git
+Ubicación: Asegúrate de mantener todos los archivos .ps1 en la misma carpeta para que el script principal pueda invocarlos correctamente.
+
+🚀 Uso
+El toolkit requiere privilegios de Administrador para modificar registros y servicios del sistema.
+
+Abre PowerShell como Administrador.
+
+(Opcional) Si las políticas de Windows bloquean el script, ejecuta:
+
+PowerShell
+Set-ExecutionPolicy Bypass -Scope Process
+Lanza el menú principal:
+
+PowerShell
+.\Hardening_Hugo.ps1
+📝 Ejemplo Real de Ejecución
+Imagina que necesitas securizar un equipo que se va a conectar a una red pública o desconocida:
+
+Reducción de red: Ejecutas la opción [4], entras al "Gestor de Red" y desactivas LLMNR y NetBIOS. Esto evita que atacantes en la misma red puedan robar tus credenciales mediante técnicas de poisoning.
+
+Blindaje de hardware: Seleccionas la opción [5] para bloquear los puertos USB. Si alguien intenta conectar un pendrive malicioso con un payload, el sistema simplemente no cargará el dispositivo.
+
+Escaneo de seguridad: Finalmente, lanzas la opción [3] (Cazador de Procesos). El script detecta un proceso ejecutándose desde la carpeta Temp y sin firma digital; lo seleccionas en la ventana emergente y lo finalizas de inmediato.

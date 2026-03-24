@@ -1,4 +1,4 @@
-# 🛡️ Win11 Hardening Toolkit — by Chugo05
+# 🛡️ Win11 Hardening Toolkit — by Chugo_05
 
 Toolkit modular de bastionado para **Windows 11** escrito en PowerShell. Permite reforzar la seguridad del sistema operativo mediante un menú interactivo que agrupa distintas herramientas de hardening, cada una enfocada en un vector de ataque diferente.
 
@@ -13,13 +13,17 @@ El toolkit está compuesto por un **script orquestador** (`Hardening_Hugo.ps1`) 
 | Script | Módulo | Descripción |
 |---|---|---|
 | `Hardening_Hugo.ps1` | Menú Principal | Orquestador central con banner ASCII y navegación por menú |
+| `Escudo_Privacidad.ps1` | Escudo de Privacidad | Desactiva la telemetría de Windows y elimina bloatware preinstalado |
 | `Apoyo_Defender.ps1` | Fortificador de Windows Defender | Panel de control para ajustar políticas avanzadas de Defender vía `Set-MpPreference` |
 | `Process_Hunter.ps1` | Cazador de Procesos Sospechosos | Auditoría de procesos en tiempo real: detecta procesos ocultos, rutas inusuales y ejecutables sin firma digital |
+| `Gestor_de_Red.ps1` | Gestión de Superficie de Red | Control de protocolos de red peligrosos: SMBv1, RDP y LLMNR |
 | `Control_USB.ps1` | Control de Puertos USB | Bloqueo/desbloqueo del driver `USBSTOR` mediante el registro de Windows |
 
-> ⚙️ Los módulos `Escudo_Privacidad.ps1` y `Gestor_de_Red.ps1` están referenciados en el menú y pueden incorporarse al repositorio cuando estén disponibles.
-
 ### Detalles técnicos por módulo
+
+**`Escudo_Privacidad.ps1`** — Actúa sobre dos vectores de privacidad:
+- **Telemetría**: deshabilita el servicio `DiagTrack` y establece el nivel de diagnóstico al mínimo en `HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection → AllowTelemetry = 0`.
+- **Bloatware**: desinstala aplicaciones preinstaladas mediante `Remove-AppxPackage` y `Get-AppxProvisionedPackage`.
 
 **`Apoyo_Defender.ps1`** — Gestiona cuatro políticas de Defender con toggle ON/OFF en tiempo real:
 - **Protección PUA** (`PUAProtection`): bloquea aplicaciones potencialmente no deseadas.
@@ -27,12 +31,17 @@ El toolkit está compuesto por un **script orquestador** (`Hardening_Hugo.ps1`) 
 - **Anti-Ransomware** (`EnableControlledFolderAccess`): protege carpetas del sistema contra modificaciones no autorizadas.
 - **Protección de Red** (`EnableNetworkProtection`): bloquea conexiones a dominios maliciosos conocidos.
 
-> ⚠️ **Compatibilidad:** Este módulo **podría no funcionar** si hay un antivirus de terceros instalado (Kaspersky, ESET, Avast, RAV Endpoint, Norton, etc.). A veces Windows desactiva el servicio `WinDefend` automáticamente cuando detecta otro motor antivirus activo, lo que hace que `Get-MpPreference` y `Set-MpPreference` fallen con el error `HRESULT 0x800106ba`. Por esto, solo se recomienda usar este módulo si usas Windows Defender.
+> ⚠️ **Compatibilidad:** Este módulo **no funcionará** si hay un antivirus de terceros instalado (Kaspersky, ESET, Avast, RAV Endpoint, Norton, etc.). Windows desactiva el servicio `WinDefend` automáticamente cuando detecta otro motor antivirus activo, lo que hace que `Get-MpPreference` y `Set-MpPreference` fallen con el error `HRESULT 0x800106ba`. Para usar este módulo es necesario desinstalar el antivirus de terceros y reiniciar el equipo, tras lo cual Defender se reactiva de forma automática.
 
 **`Process_Hunter.ps1`** — Realiza tres capas de detección:
 1. Cruza la lista de `Get-Process` con `Get-CimInstance Win32_Process` para identificar procesos que se ocultan del Task Manager.
 2. Analiza la ruta del ejecutable en busca de ubicaciones de riesgo (`AppData`, `Temp`, `Downloads`, `Public`).
 3. Verifica la firma digital con `Get-AuthenticodeSignature`. Los resultados se muestran en `Out-GridView` para terminar procesos de forma selectiva con `Stop-Process -Force`.
+
+**`Gestor_de_Red.ps1`** — Controla tres protocolos de red con alto riesgo de explotación:
+- **SMBv1**: deshabilita el protocolo mediante `Set-SmbServerConfiguration -EnableSMB1Protocol $false`, previniendo ataques tipo WannaCry.
+- **RDP**: habilita o deshabilita el Escritorio Remoto vía `HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server → fDenyTSConnections`.
+- **LLMNR**: desactiva el protocolo de resolución de nombres local susceptible a envenenamiento (Responder) en `HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient → EnableMulticast = 0`.
 
 **`Control_USB.ps1`** — Modifica el valor `Start` del servicio `USBSTOR` en el registro (`HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR`):
 - Valor `4` → driver **deshabilitado** (USB bloqueados).
